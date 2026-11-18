@@ -1,28 +1,73 @@
 {% extends "base.html" %}
 
 {% block title %}
-  {% if action == "edit" %}Edit item{% else %}Add item{% endif %}
+  {% if action == "edit" %}Edit {{ item["name"] }}{% else %}Add menu item{% endif %}
 {% endblock %}
 
 {% block content %}
-  <h2>{% if action == "edit" %}Edit item{% else %}Add item{% endif %}</h2>
+  {#
+    Form fields posted to app.py:
+      name, description  text
+      category_id        1 Burgers, 2 Sides, 3 Drinks, 4 Desserts
+      price              dollars, e.g. "8.99"; store round(float(price) * 100) as price_cents
+      calories           integer
+      is_available       "1" when checked, absent when unchecked
+  #}
+  {% set categories = [(1, "Burgers"), (2, "Sides"), (3, "Drinks"), (4, "Desserts")] %}
 
-  <!-- TODO: change input name=... attributes to match your columns -->
-  <form method="post"
-        action="{% if action == 'edit' %}{{ url_for('edit_item', item_id=item['id']) }}{% else %}{{ url_for('create_item') }}{% endif %}">
-    <label for="name">Name</label>
-    <input type="text" id="name" name="name" required
-           value="{% if item is defined %}{{ item['name'] }}{% endif %}">
+  <section class="card form-card">
+    <h1>{% if action == "edit" %}Edit item{% else %}New menu item{% endif %}</h1>
 
-    <label for="category">Category</label>
-    <input type="text" id="category" name="category"
-           value="{% if item is defined %}{{ item['category'] }}{% endif %}">
+    <form method="post"
+          action="{% if action == 'edit' %}{{ url_for('edit_item', item_id=item['id']) }}{% else %}{{ url_for('create_item') }}{% endif %}">
+      <div class="form-grid">
+        <div class="full">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required placeholder="Whopper"
+                 value="{% if item is defined %}{{ item['name'] }}{% endif %}">
+        </div>
 
-    <label for="year">Year</label>
-    <input type="number" id="year" name="year"
-           value="{% if item is defined %}{{ item['year'] }}{% endif %}">
+        <div class="full">
+          <label for="description">Description</label>
+          <textarea id="description" name="description"
+                    placeholder="Flame-grilled beef, tomatoes, lettuce...">{% if item is defined and item['description'] %}{{ item['description'] }}{% endif %}</textarea>
+        </div>
 
-    <button type="submit">{% if action == "edit" %}Update{% else %}Save{% endif %}</button>
-    <a href="{{ url_for('home') }}">Cancel</a>
-  </form>
+        <div>
+          <label for="category_id">Category</label>
+          <select id="category_id" name="category_id" required>
+            {% for cat_id, cat_name in categories %}
+              <option value="{{ cat_id }}"
+                {% if item is defined and item['category_id'] == cat_id %}selected{% endif %}>{{ cat_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label for="price">Price ($)</label>
+          <input type="number" id="price" name="price" required min="0" step="0.01" placeholder="8.99"
+                 value="{% if item is defined %}{{ '%.2f'|format(item['price_cents'] / 100) }}{% endif %}">
+        </div>
+
+        <div>
+          <label for="calories">Calories</label>
+          <input type="number" id="calories" name="calories" min="0" step="1" placeholder="650"
+                 value="{% if item is defined and item['calories'] is not none %}{{ item['calories'] }}{% endif %}">
+        </div>
+
+        <div>
+          <label class="checkbox">
+            <input type="checkbox" name="is_available" value="1"
+              {% if item is not defined or item['is_available'] %}checked{% endif %}>
+            Available to order
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit">{% if action == "edit" %}Update item{% else %}Add to menu{% endif %}</button>
+        <a href="{% if action == 'edit' %}{{ url_for('item_detail', item_id=item['id']) }}{% else %}{{ url_for('home') }}{% endif %}">Cancel</a>
+      </div>
+    </form>
+  </section>
 {% endblock %}

@@ -18,19 +18,30 @@ Pattern from the lab:
 """
 
 import sqlite3
+from sqlite3 import Connection, Cursor
 from pathlib import Path
 
 DATABASE = Path(__file__).parent / "items.db"
 
 
+def connecting_to_database() -> tuple[Connection, Cursor]:
+    conn = sqlite3.connect(DATABASE)
+    cur = conn.cursor()
+    return (conn, cur)
+
+
 def get_items():
     """Return all items (list of rows)."""
-    raise NotImplementedError("TODO: SELECT all rows from your table")
+    conn, cur = connecting_to_database()
+    cur.execute("""SELECT * From Burger""")
+    conn.close()
 
 
 def get_item(item_id):
     """Return one item by id, or None if it does not exist."""
-    raise NotImplementedError("TODO: SELECT one row WHERE id = ?")
+    conn, cur = connecting_to_database()
+    cur.execute("""SELECT * From Burger WHERE id = ?""", (item_id,))
+    conn.close()
 
 
 def add_item(name, category, year):
@@ -39,7 +50,12 @@ def add_item(name, category, year):
 
     TODO: change the parameters to match your columns.
     """
-    raise NotImplementedError("TODO: INSERT a row")
+    conn, cur = connecting_to_database()
+    cur.execute(
+        "INSERT INTO Burger (name, category, year) VALUES (?,?,?)",
+        (name, category, year),
+    )
+    conn.close()
 
 
 def update_item(item_id, name, category, year):
@@ -48,9 +64,16 @@ def update_item(item_id, name, category, year):
 
     TODO: change the parameters to match your columns.
     """
-    raise NotImplementedError("TODO: UPDATE a row WHERE id = ?")
+    conn, cur = connecting_to_database()
+    cur.execute(
+        "UPDATE BURGER SET name = ?, category = ?, year = ? WHERE id = ?",
+        (name, category, year, item_id),
+    )
+    conn.close()
 
 
 def delete_item(item_id):
     """Delete an item by id."""
-    raise NotImplementedError("TODO: DELETE a row WHERE id = ?")
+    conn, cur = connecting_to_database()
+    cur.execute("DELETE FROM Burger Where id = ?", (item_id))
+    conn.close()

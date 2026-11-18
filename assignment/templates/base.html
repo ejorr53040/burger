@@ -2,19 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}My Items{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Menu{% endblock %} | Burger King</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;700;800&display=swap">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <header>
-    <!-- TODO: change the app title to match your dataset -->
-    <h1><a href="{{ url_for('home') }}">My Items</a></h1>
-    <nav>
-      <a href="{{ url_for('create_item') }}">Add item</a>
-    </nav>
+  <header class="site-header">
+    <div class="inner">
+      <a class="logo" href="{{ url_for('home') }}" aria-label="Burger King home">
+        <span class="bun bun-top"></span>
+        <span class="logo-text">Burger<br>King</span>
+        <span class="bun bun-bottom"></span>
+      </a>
+      <nav class="site-nav">
+        <a href="{{ url_for('home') }}">Menu</a>
+        <a class="button button-small" href="{{ url_for('create_item') }}">+ Add item</a>
+      </nav>
+    </div>
   </header>
   <main>
     {% block content %}{% endblock %}
   </main>
+  <footer class="site-footer">
+    Have it your way. Class project mock-up, not affiliated with Burger King.
+  </footer>
 </body>
 </html>
