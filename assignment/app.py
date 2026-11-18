@@ -7,6 +7,7 @@ TODO:
   3. Update form field names to match your dataset columns.
 """
 
+import db
 from flask import Flask, redirect, render_template, request, url_for  # noqa: F401
 
 # from db import get_items, get_item, add_item, update_item, delete_item
@@ -19,7 +20,8 @@ def home():
     """List all items."""
     # TODO: items = get_items()
     # TODO: return render_template("index.html", items=items)
-    raise NotImplementedError("TODO: show the item list")
+    items = db.get_items()
+    return render_template("index.html", items=items)
 
 
 @app.route("/items/<int:item_id>")
@@ -28,7 +30,9 @@ def item_detail(item_id):
     # TODO: item = get_item(item_id)
     # TODO: if item is None: return redirect(url_for("home"))
     # TODO: return render_template("detail.html", item=item)
-    raise NotImplementedError("TODO: show one item")
+    item = db.get_item(item_id)
+    if item is None:
+        return redirect(url_for("home"))
 
 
 @app.route("/items/new", methods=["GET", "POST"])
@@ -37,8 +41,13 @@ def create_item():
     GET  → show an empty form
     POST → read request.form, call add_item(...), redirect home
     """
-    # TODO: implement create
-    raise NotImplementedError("TODO: create an item")
+    if request.method == "POST":
+        name = request.form["name"]
+        category = request.form["category"]
+        year = request.form.get("year") or None
+        db.add_item(name, category, int(year) if year else None)
+        return redirect(url_for("home"))
+    return render_template("form.html", action="create")
 
 
 @app.route("/items/<int:item_id>/edit", methods=["GET", "POST"])
@@ -48,7 +57,18 @@ def edit_item(item_id):
     POST → call update_item(...), redirect home
     """
     # TODO: implement edit
-    raise NotImplementedError("TODO: edit an item")
+    item = db.get_item(item_id)
+    if item is None:
+        return redirect(url_for("home"))
+
+    if request.method == "POST":
+        name = request.form["name"]
+        category = request.form["category"]
+        year = request.form.get("year") or None
+        db.update_item(item_id, name, category, int(year) if year else None)
+        return redirect(url_for("home"))
+
+    return render_template("form.html", action="edit", item=item)
 
 
 @app.route("/items/<int:item_id>/delete", methods=["POST"])

@@ -55,6 +55,7 @@ def add_item(name, category, year):
         "INSERT INTO Burger (name, category, year) VALUES (?,?,?)",
         (name, category, year),
     )
+    conn.commit()
     conn.close()
 
 
@@ -69,6 +70,7 @@ def update_item(item_id, name, category, year):
         "UPDATE BURGER SET name = ?, category = ?, year = ? WHERE id = ?",
         (name, category, year, item_id),
     )
+    conn.commit()
     conn.close()
 
 
@@ -76,4 +78,5 @@ def delete_item(item_id):
     """Delete an item by id."""
     conn, cur = connecting_to_database()
     cur.execute("DELETE FROM Burger Where id = ?", (item_id))
+    conn.commit()
     conn.close()
